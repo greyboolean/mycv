@@ -1,5 +1,4 @@
 import {
-  BadGatewayException,
   BadRequestException,
   Injectable,
   NotFoundException,
@@ -18,7 +17,7 @@ export class AuthService {
     // See if email is in use
     const users = await this.usersService.find(email);
     if (users.length) {
-      throw new BadGatewayException('email in use');
+      throw new BadRequestException('email in use');
     }
 
     // Hash the users password
