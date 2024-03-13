@@ -10,10 +10,26 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     // Create a fake copy of the users service
+    // fakeUsersService = {
+    //   find: () => Promise.resolve([]),
+    //   create: (email: string, password: string) =>
+    //     Promise.resolve({ id: 1, email, password } as User),
+    // };
+    const users: User[] = [];
     fakeUsersService = {
-      find: () => Promise.resolve([]),
-      create: (email: string, password: string) =>
-        Promise.resolve({ id: 1, email, password } as User),
+      find: (email: string) => {
+        const filteredUsers = users.filter((user) => user.email === email);
+        return Promise.resolve(filteredUsers);
+      },
+      create: (email: string, password: string) => {
+        const user = {
+          id: Math.floor(Math.random() * 999999),
+          email,
+          password,
+        } as User;
+        users.push(user);
+        return Promise.resolve(user);
+      },
     };
 
     const module = await Test.createTestingModule({
@@ -63,16 +79,17 @@ describe('AuthService', () => {
   });
 
   it('returns a user if correct password is provided', async () => {
-    fakeUsersService.find = () =>
-      Promise.resolve([
-        {
-          email: 'asdf@asdf.com',
-          password:
-            'cd7c581cab74b3d9.c041e22cc789be9a838bf48599878b95a516a4157a1133cb0ddbcc683f5ec7ff',
-        } as User,
-      ]);
+    // fakeUsersService.find = () =>
+    //   Promise.resolve([
+    //     {
+    //       email: 'asdf@asdf.com',
+    //       password:
+    //         'cd7c581cab74b3d9.c041e22cc789be9a838bf48599878b95a516a4157a1133cb0ddbcc683f5ec7ff',
+    //     } as User,
+    //   ]);
+    await service.signup('asdf@asdf.com', 'mypassword');
 
-    const user = await service.signin('asdf@asdf.com', 'mypassword');
+    const user = await service.signin('asdf@asdf.com', 'mypassword1');
     expect(user).toBeDefined();
     // const user = await service.signup('asdf@asdf.com', 'mypassword');
     // console.log(user);
